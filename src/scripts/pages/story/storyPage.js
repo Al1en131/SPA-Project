@@ -1,57 +1,43 @@
-import StoryPresenter from "../../presenters/storyPresenter.js";
+import FavoriteStoryDB from "../../utils/indexedDB.js";
 
 export default class StoryPage {
-  constructor() {
-    this.presenter = new StoryPresenter(this);
-  }
-
   async render() {
     return `
       <main id="main-content" class="main-content" tabindex="0">
-          <h1 class="title">Daftar Story</h1>
-          <form id="story-form">
-              <input type="text" id="story-input" placeholder="Write your story..." required />
-              <button type="submit">Save</button>
-          </form>
-          <section id="story-list" aria-live="polite"></section>
+          <h1 class="title">Saved Stories</h1>
+          <section id="favorite-list" aria-live="polite"></section>
       </main>
     `;
   }
 
   async afterRender() {
-    this.setupEventListeners();
-    this.presenter.loadStories();
-  }
+    const favoriteStories = await FavoriteStoryDB.getAllStories();
+    const listContainer = document.getElementById("favorite-list");
 
-  setupEventListeners() {
-    document.getElementById("story-form").addEventListener("submit", (event) => {
-      event.preventDefault();
-      const storyInput = document.getElementById("story-input");
-      const storyContent = storyInput.value.trim();
-      if (storyContent) {
-        this.presenter.addStory(storyContent);
-        storyInput.value = "";
-      }
-    });
-  }
+    if (favoriteStories.length === 0) {
+      listContainer.innerHTML = "<p>Belum ada story yang disimpan.</p>";
+      return;
+    }
 
-  displayStories(stories) {
-    const listContainer = document.getElementById("story-list");
-    listContainer.innerHTML = "";
-    stories.forEach((story) => {
+    favoriteStories.forEach((story) => {
       const item = document.createElement("div");
       item.className = "story-item";
       item.innerHTML = `
-        <p style="margin-bottom: 10px;">${story.content}</p>
-        <button class="delete-btn" data-id="${story.id}">Delete</button>
+        <img src="${story.photoUrl}" alt="Foto dari ${story.name}" class="story-image">
+        <h3>${story.name}</h3>
+        <p>${story.description}</p>
+        <p>Created at ${story.createdAt}</p>
+        <button class="unsave-story-btn" data-id="${story.id}">💔 Remove</button>
       `;
       listContainer.appendChild(item);
     });
 
-    document.querySelectorAll(".delete-btn").forEach(button => {
-      button.addEventListener("click", (event) => {
-        const id = parseInt(event.target.dataset.id, 10);
-        this.presenter.deleteStory(id);
+    document.querySelectorAll(".unsave-story-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const id = e.target.dataset.id;
+        await FavoriteStoryDB.deleteStory(id);
+        alert("Story dihapus dari favorit!");
+        this.afterRender(); // Refresh list
       });
     });
   }

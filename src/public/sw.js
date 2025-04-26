@@ -13,36 +13,42 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
             return cache.addAll(urlsToCache);
-        })
+        }).then(() => self.skipWaiting())
     );
 });
 
-self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request).then(response => {
-            return response || fetch(event.request);
-        })
+self.addEventListener('activate', event => {
+    event.waitUntil(
+        caches.keys().then(cacheNames => {
+            return Promise.all(
+                cacheNames
+                    .filter(name => name !== CACHE_NAME)
+                    .map(name => caches.delete(name))
+            );
+        }).then(() => self.clients.claim())
     );
 });
+
+self.addEventListener("fetch", (event) => {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        return cachedResponse || fetch(event.request);
+      }).catch(() => {
+      })
+    );
+  });
+  
 
 self.addEventListener('push', event => {
-    const options = {
-        body: event.data ? event.data.text() : 'New Story Update!',
-        icon: 'icon.png',
-        badge: '/icon.png'
-    };
+    let data = { title: "Notification", options: { body: "You have a new notification!" } };
+    
+    if (event.data) {
+        data = event.data.json();
+    }
+    
     event.waitUntil(
-        self.registration.showNotification('Story App Notification', options)
+        self.registration.showNotification(data.title, data.options)
     );
 });
 
-self.addEventListener('message', event => {
-    if (event.data && event.data.type === 'NEW_STORY') {
-        self.registration.showNotification('Story App', {
-            body: event.data.message,
-            icon: '/icon.png',
-            badge: '/icon.png'
-        });
-    }
-});
-
+  

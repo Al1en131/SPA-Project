@@ -5,14 +5,15 @@
 }
 
 .main-header {
-  min-height: 90px;
-  padding-block: 20px;
-
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 230px;
+  gap: 20px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1; 
 }
+
 
 .brand-name {
   font-size: 1.125rem;
@@ -20,6 +21,19 @@
   text-decoration: none;
   color: #333;
 }
+
+
+
+@media screen and (width > 1000px) {
+  .main-header {
+    flex-wrap: nowrap; 
+  }
+
+  .notification-buttons {
+    margin-left: auto;
+  }
+}
+
 
 .navigation-drawer {
   min-height: 100vh;
@@ -123,6 +137,7 @@ header {
   color: white;
   font-size: 1.5rem;
   width: 100%;
+  overflow: visible;
 }
 
 body {
@@ -324,6 +339,25 @@ h2 {
   }
 }
 
+#notification-buttons-container {
+  display: flex;
+  align-items: center;
+}
+
+#subscribe-btn, #unsubscribe-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#unsubscribe-btn {
+  background-color: #dc3545;
+}
+
+
 .skip-to-content {
   position: absolute;
   top: 40px; 
@@ -339,9 +373,10 @@ h2 {
   transition: top 0.3s, opacity 0.3s;
   z-index: 1000;
 }
-
+ 
 .skip-to-content:focus {
   top: 10px;
   opacity: 0;
 }
+ 
 

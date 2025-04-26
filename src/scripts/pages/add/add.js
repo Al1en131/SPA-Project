@@ -37,12 +37,5 @@ export default class AddPage {
     this.presenter.init();
   }
 
-  displayMessage(message) {
-    document.getElementById("message").textContent = message;
-  }
-
-  navigateToStoryList() {
-    alert("Story berhasil ditambahkan!");
-    window.location.hash = "#story";
-  }
 }
+

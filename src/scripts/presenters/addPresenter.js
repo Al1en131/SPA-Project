@@ -86,11 +86,6 @@ export default class AddPresenter {
             parseFloat(this.selectedLon)
           );
 
-          this.view.displayMessage(response.message);
-
-          if (!response.error) {
-            this.view.navigateToStoryList();
-          }
         }, "image/png");
       });
   }

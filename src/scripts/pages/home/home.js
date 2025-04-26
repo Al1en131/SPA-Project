@@ -1,4 +1,5 @@
 import StoryPresenter from "../../presenters/homePresenter.js";
+import FavoriteStoryDB from "../../utils/indexedDB.js";
 
 export default class HomePage {
   constructor() {
@@ -42,10 +43,22 @@ export default class HomePage {
         <h3>${story.name}</h3>
         <p>${story.description}</p>
         <p>Created at ${story.createdAt}</p>
+        <button class="save-story-btn" data-id="${story.id}">❤️ Save</button>
       `;
       listContainer.appendChild(item);
     });
 
-    this.presenter.loadMap(stories); 
+    document.querySelectorAll(".save-story-btn").forEach((btn) => {
+      btn.addEventListener("click", async (e) => {
+        const storyId = e.target.dataset.id;
+        const storyToSave = stories.find((s) => s.id === storyId);
+        if (storyToSave) {
+          await FavoriteStoryDB.saveStory(storyToSave);
+          alert(`Story "${storyToSave.name}" disimpan ke favorit!`);
+        }
+      });
+    });
+
+    this.presenter.loadMap(stories);
   }
 }

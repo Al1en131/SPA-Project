@@ -6,9 +6,16 @@ export default class StoryPresenter {
   }
 
   async loadStories() {
-    const stories = await getStories();
-    this.view.displayStories(stories);
+    try {
+      const stories = await getStories();
+      this.view.displayStories(stories);
+    } catch (error) {
+      console.error("Gagal memuat stories:", error);
+      this.view.displayStories([]);
+      alert("Kamu sedang offline. Data tidak bisa dimuat.");
+    }
   }
+  
 
   loadMap(stories) {
     const map = L.map("map").setView([-2.5489, 118.0149], 5);
